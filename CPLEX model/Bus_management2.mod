@@ -38,7 +38,7 @@ int z[1..n][1..m] = ...;// le chauffeur i connait la ligne j
    		ct3: (y[i][j] + y[i][j+1] + y[i][j+2] + y[i][j+3]) <= 3; // pas plus de 3 nuit de suite
    }
 
-	forall(i in 1..n){
+	forall(i in 1..n){ //parfois relaxée
 		ct4: sum(j in 1..T) y[i][j] == 4; // 4 nuits pour les 2 semaines	pour chacun
 	}
 	
@@ -48,6 +48,6 @@ int z[1..n][1..m] = ...;// le chauffeur i connait la ligne j
 		ct61: sum(i in 1..n) x[i][j]*z[i][k] >= 1;
 		ct65: sum(i in 1..n) x[i][j] == m;
 		ct62: sum(i in 1..n) y[i][j]*z[i][k] >= 1;
-		//ct66: sum(i in 1..n) y[i][j] == m;
+		ct66: sum(i in 1..n) y[i][j] == m;
 	}		
  }
