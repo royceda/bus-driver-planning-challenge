@@ -18,11 +18,11 @@ OBJECTS = third_prog.o
 
 
 exec : $(OBJECTS)
-	$(CC) $(CFLAGS) -o exe $(OBJECTS) $(CPLEXFLAGS)
+	$(CC) $(CFLAGS) $(DEBUG) -o exe $(OBJECTS) $(CPLEXFLAGS)
 
 
 third_prog.o : third_prog.cpp
-	$(CC) $(CFLAGS) $(CPLEXFLAGS) -c third_prog.cpp
+	$(CC) $(CFLAGS) $(DEBUG)  $(CPLEXFLAGS) -c third_prog.cpp
 
 
 clean :
