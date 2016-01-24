@@ -73,58 +73,57 @@ int main(int argc, char **argv) {
     stz.push_back("");
   }
   
-  stpm[0] = "1,5,7,8,9,11";
-  stpm[1] = "1,5,7,8,9,11";
-  stpm[2] = "1,5,7,8,9,11";
-  stpm[3] = "1,5,7,8,9,11";
-  stpm[4] = "1,5,7,8,9,11";
-  stpm[5] = "1,5,7,8,9,11";
-  stpm[6] = "1,5,7,8,9,11";
-  stpm[7] = "1,5,7,8,9,11";
-  stpm[8] = "1,5,7,8,9,11";
-  stpm[9] = "1,5,7,8,9,11";
-  stpm[10] = "1,5,7,8,9,11";
+  stpd[0] = "8,14";
+  stpd[1] = "7,9";
+  stpd[2] = "1,10";
+  stpd[3] = "3,4,11";
+  stpd[4] = "10,11";
+  stpd[5] = "6,12";
+  stpd[6] = "5,6,14";
+  stpd[7] = "1,6,7";
+  stpd[8] = "14";
+  stpd[9] = "1,8,9";
+  stpd[10] = "3,9";
 
-  stpm[0] = "1,5,7,8,9,11";
-  stpm[1] = "1,5,7,8,9,11";
-  stpm[2] = "1,5,7,8,9,11";
-  stpm[3] = "1,5,7,8,9,11";
-  stpm[4] = "1,5,7,8,9,11";
-  stpm[5] = "1,5,7,8,9,11";
-  stpm[6] = "1,5,7,8,9,11";
-  stpm[7] = "1,5,7,8,9,11";
-  stpm[8] = "1,5,7,8,9,11";
-  stpm[9] = "1,5,7,8,9,11";
-  stpm[10] = "1,5,7,8,9,11";
+  stpm[0] = "9,12,13";
+  stpm[1] = "6";
+  stpm[2] = "8";
+  stpm[3] = "8,10,";
+  stpm[4] = "12,13";
+  stpm[5] = "5";
+  stpm[6] = "1,7,";
+  stpm[7] = "2,9";
+  stpm[8] = "";
+  stpm[9] = "11";
+  stpm[10] = "8";
 
-
-  stpa[0] = "1,5,7,6,9,10";
-  stpa[1] = "1,5,7,6,9,10";
-  stpa[2] = "1,5,7,6,9,10";
-  stpa[3] = "1,5,7,6,9,10";
-  stpa[4] = "1,5,7,6,9,10";
-  stpa[5] = "1,5,7,6,4,10";
-  stpa[6] = "1,5,7,6,4,10";
-  stpa[7] = "1,5,7,6,4,10";
-  stpa[8] = "1,5,7,6,4,10";
-  stpa[9] = "1,5,7,6,4,10";
-  stpa[10] = "1,5,7,6,4,10";
+  stpa[0] = "7";
+  stpa[1] = "6,9";
+  stpa[2] = "14";
+  stpa[3] = "2";
+  stpa[4] = "";
+  stpa[5] = "3,14";
+  stpa[6] = "";
+  stpa[7] = "";
+  stpa[8] = "6,8";
+  stpa[9] = "2,3";
+  stpa[10] = "";
   
-  std[0] = "1,5,4,7,9,1,3";
-  std[1] = "1,5,4,7,9,1,3";
-  std[2] = "1,5,4,7,9,1,3";
-  std[3] = "1,5,4,7,9,1,3";
-  std[4] = "1,5,4,7,9,1,3";
-  std[5] = "1,5,4,7,9,1,3";
-  std[6] = "1,5,4,7,9,1,3";
-  std[7] = "1,5,4,7,9,1,3";
-  std[8] = "1,5,4,7,9,1,3";
-  std[9] = "1,5,4,7,9,1,3";
-  std[10] = "1,5,4,7,9,1,3";
+  std[0] = "3,4,10,11";
+  std[1] = "4,5,11,12";
+  std[2] = "5,6,12,13";
+  std[3] = "6,7,13,14";
+  std[4] = ",7,8,14,1";
+  std[5] = "1,2,8,9";
+  std[6] = "2,3,9,10";
+  std[7] = "3,4,10,11";
+  std[8] = "4,5,11,12";
+  std[9] = "5,6,12,13";
+  std[10] = "6,7,13,14";
   
-  stz[0] = "2";
-  stz[1] = "1";
-  stz[2] = "1";
+  stz[0] = "2,";
+  stz[1] = "1,";
+  stz[2] = "1,";
   stz[3] = "2,3";
   stz[4] = "1,2";
   stz[5] = "2";
@@ -139,8 +138,8 @@ int main(int argc, char **argv) {
     
     istringstream split_z(stz[i]);
     istringstream split_d(std[i]);
-    istringstream split_pd(stpa[i]);
-    istringstream split_pm(stpa[i]);
+    istringstream split_pd(stpd[i]);
+    istringstream split_pm(stpm[i]);
     istringstream split_pa(stpa[i]);
 
     vector<string> tokens_z;
@@ -151,37 +150,40 @@ int main(int argc, char **argv) {
 
     
     for(string each; getline(split_pm, each, split_char); tokens_pm.push_back(each));    
-    for(int j = 0; j<tokens_pm.size(); j++){
-      int index = stoi(tokens_pm[j])-1; 
+    for(unsigned int j = 0; j<tokens_pm.size(); j++){
+      cout << stoi(tokens_pm[j]) << "\t";
+      int index = stoi(tokens_pm[j]) - 1; 
       pm[i][index] = 1;
     }
+    cout << "ok" <<endl;
  
     for(string each; getline(split_pa, each, split_char); tokens_pa.push_back(each));
-    for(int j = 0; j<tokens_pa.size(); j++){
-      //      cout << stoi(tokens_pa[j]) << endl;
+    for(unsigned int j = 0; j<tokens_pa.size(); j++){
+     
       int index = stoi(tokens_pa[j])-1; 
       pa[i][index] = 1;
     }
    
     for(string each; getline(split_pd, each, split_char); tokens_pd.push_back(each));
-    for(int j = 0; j<tokens_pd.size(); j++){
+    for(unsigned int j = 0; j<tokens_pd.size(); j++){
       int index = stoi(tokens_pd[j])-1; 
       pd[i][index] = 1;
     }
 
    
     for(string each; getline(split_z, each, split_char); tokens_z.push_back(each));
-    for(int j = 0; j<tokens_z.size(); j++){
+    for(unsigned int j = 0; j<tokens_z.size(); j++){
       int index = stoi(tokens_z[j])-1; 
       z[i][index] = 1;
     }
-    
+
 
     for(string each; getline(split_d, each, split_char); tokens_d.push_back(each));    
-    for(int j = 0; j<tokens_d.size(); j++){
+    for(unsigned int j = 0; j<tokens_d.size(); j++){
       int index = stoi(tokens_d[j])-1; 
       d[i][index] = 1;
     }
+    
   }
   cout << "parse: OK" << endl;
 
