@@ -17,8 +17,8 @@ int main(int argc, char **argv) {
   int m = 3;
 
 
-  IloArray <IloArray <IloNumVar> > x(env,n); //dvar
-  IloArray <IloArray <IloNumVar> > y(env,n); //dvar
+  IloArray <IloNumVarArray> x(env,n); //dvar
+  IloArray <IloNumVarArray> y(env,n); //dvar
   IloRangeArray c(env); //constraints
 
 
@@ -33,8 +33,8 @@ int main(int argc, char **argv) {
 
   //init
   for(int i =0; i<n; i++){
-    x[i] = IloArray <IloNumVar> (env, t);
-    y[i] = IloArray <IloNumVar> (env, t);
+    x[i] = IloNumVarArray(env, t);
+    y[i] = IloNumVarArray(env, t);
     for(int j=0; j<t; j++){
       x[i][j] =  IloNumVar(env, 0, 1, ILOBOOL);
       y[i][j] =  IloNumVar(env, 0, 1, ILOBOOL);
@@ -46,13 +46,13 @@ int main(int argc, char **argv) {
     z.push_back(vector <int>());
 
     for(int k=0; k<m; k++){
-      z[i].push_back(1);
+      z[i].push_back(0);
     }
 
     pm.push_back(vector <int>());
     for(int j=0; j<t; j++){
-      pm[i].push_back(1);
-      pa[i].push_back(1);
+      pm[i].push_back(0);
+      pa[i].push_back(0);
       pd[i].push_back(0);
       d[i].push_back(0);
     }
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
   std[1] = "4,5,11,12";
   std[2] = "5,6,12,13";
   std[3] = "6,7,13,14";
-  std[4] = ",7,8,14,1";
+  std[4] = "7,8,14,1";
   std[5] = "1,2,8,9";
   std[6] = "2,3,9,10";
   std[7] = "3,4,10,11";
@@ -122,8 +122,8 @@ int main(int argc, char **argv) {
   std[10] = "6,7,13,14";
   
   stz[0] = "2,";
-  stz[1] = "1,";
-  stz[2] = "1,";
+  stz[1] = "1";
+  stz[2] = "1";
   stz[3] = "2,3";
   stz[4] = "1,2";
   stz[5] = "2";
@@ -151,33 +151,33 @@ int main(int argc, char **argv) {
     
     for(string each; getline(split_pm, each, split_char); tokens_pm.push_back(each));    
     for(unsigned int j = 0; j<tokens_pm.size(); j++){
-      cout << stoi(tokens_pm[j]) << "\t";
+      /// cout << stoi(tokens_pm[j]) << "\t";
       int index = stoi(tokens_pm[j]) - 1; 
       pm[i][index] = 1;
     }
-    cout << "ok" <<endl;
- 
+    //cout << "ok" <<endl;
+    
     for(string each; getline(split_pa, each, split_char); tokens_pa.push_back(each));
     for(unsigned int j = 0; j<tokens_pa.size(); j++){
      
       int index = stoi(tokens_pa[j])-1; 
       pa[i][index] = 1;
     }
-   
+    
     for(string each; getline(split_pd, each, split_char); tokens_pd.push_back(each));
     for(unsigned int j = 0; j<tokens_pd.size(); j++){
       int index = stoi(tokens_pd[j])-1; 
       pd[i][index] = 1;
     }
 
-   
+    
     for(string each; getline(split_z, each, split_char); tokens_z.push_back(each));
     for(unsigned int j = 0; j<tokens_z.size(); j++){
       int index = stoi(tokens_z[j])-1; 
       z[i][index] = 1;
     }
 
-
+    
     for(string each; getline(split_d, each, split_char); tokens_d.push_back(each));    
     for(unsigned int j = 0; j<tokens_d.size(); j++){
       int index = stoi(tokens_d[j])-1; 
@@ -204,53 +204,53 @@ int main(int argc, char **argv) {
   /*constraints*/
 
   //ct1
-  for(int i = 0; i<n; i++){
-    IloExpr e1(env);
+  for(int i = 0; i<n; i++){  
     for(int j=0; j<t; j++){
+      IloExpr e1(env);
       e1 = x[i][j] + y[i][j] + d[i][j];
-
-    }
-    c.add(e1 <= 1);
-    e1.end();
+      c.add(e1 <= 1);
+      e1.end();
+    } 
   }
 
 
   //ct2
   for(int i = 0; i<n; i++){
-    IloExpr e2(env);
-    for(int j=0; j<t; j++){
-      e2 = x[i][j] + y[i][j] + d[i][j];
-
+    for(int j=0; j<t-1; j++){
+      IloExpr e2(env);
+      e2 = x[i][j] + y[i][j+1];
+      c.add(e2 <= 1);
+      e2.end();
     }
-    c.add(e2 <= 1);
-    e2.end();
   }
 
 
 
   //ct3
   for(int i = 0; i<n; i++){
-    IloExpr e3(env);
     for(int j=0; j<t-3; j++){
+      IloExpr e3(env);
       e3 = y[i][j] + y[i][j+1] + y[i][j+2] + y[i][j+3];
+      c.add(e3 <= 3);
+      e3.end();
     }
-    c.add(e3 <= 3);
-    e3.end();
   }
 
 
 
   //ct4
-  IloExpr e4(env);
+ 
   for(int i = 0; i<n; i++){
-    for(int j=0; j<t-3; j++){
+    IloExpr e4(env); 
+    for(int j=0; j<t; j++){
       e4 += y[i][j];
     }
+    c.add(e4 <= 4);
+    e4.end();
   }
-  c.add(e4 <= 4);
-  e4.end();
+ 
 
-
+  
   //ct5
   for(int k = 0; k<m; k++){
     for(int j=0; j<t; j++){
@@ -258,15 +258,16 @@ int main(int argc, char **argv) {
       IloExpr e51(env);
       IloExpr e6(env);
       IloExpr e61(env);
+
       for(int i =0 ; i<n; i++){
 	e5  += x[i][j]*z[i][k];
 	e51 += x[i][j];
 	e6  += y[i][j]*z[i][k];
 	e61 += x[i][j];
       }
-      c.add(e5 >= 1);
+      //c.add(e5 >= 1);
       c.add(e51 == m);
-      c.add(e6 >= 1);
+      //c.add(e6 >= 1);
       c.add(e61 == m);
       e5.end();
       e51.end();
@@ -274,7 +275,7 @@ int main(int argc, char **argv) {
       e61.end();
     }
   }
-
+  
   
   model.add(c);
 
@@ -283,16 +284,25 @@ int main(int argc, char **argv) {
 
   //Solving
   IloCplex cplex(model);
-
   cplex.solve();
-  // cout << "max= " << cplex.getObjValue() << endl;
+  cout << "max= " << cplex.getObjValue() << endl;
 
   //primal
-  IloArray<IloNumArray> p(env);
-  //cplex.getValues(p, x);
+  cout << "Le matin" << endl; 
+  for(int i=0; i<n; i++){
+    IloNumArray  p(env);
+    cplex.getValues(p, x[i]);
+    cout <<  i << " = " << p << endl;
+    p.end();
+  }
 
-
-  cout << "Primal = " << p << endl;
+  cout << "Le soir" << endl; 
+  for(int i=0; i<n; i++){
+    IloNumArray  p(env);
+    cplex.getValues(p, y[i]);
+    cout << i << " = " << p << endl;
+    p.end();
+  }
 
   //Duals
   //IloNumArray v(env);
