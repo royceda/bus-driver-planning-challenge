@@ -1,0 +1,170 @@
+/*********************************************
+ * OPL 12.6.0.0 Model
+ * Author: da
+ * Creation Date: 14 juin 2016 at 12:25:39
+ *********************************************/
+
+ 
+  int T = ...;
+ int n = ...;
+ int m = ...;
+ 
+ {string} team = ...;
+ 
+ {int} pref_m[i in team] = ...;
+ {int} pref_a[i in team] = ...;
+ {int} pref_d[i in team] = ...;
+ {int} tab_z[i in team]  = ...;
+ {int} tab_d[i in team]  = ...;
+ 
+ 
+ 
+ int pm [i in team][1..T] = ...;//preference matin
+ int pa [i in team][1..T] = ...;//preference aprem
+ int pd [i in team][1..T] = ...;//preference day off
+ int d  [i in team][1..T] = ...; // jour de congés
+ int z  [i in team][1..m] = ...;// le chauffeur i connait la ligne j
+
+
+execute da{
+
+	for(var i in team){
+		for(var l in pref_m[i]){
+			pm[i][l] = 1;
+		}
+		
+		for(var l in pref_a[i]){
+			pa[i][l] = 1;
+		}
+		
+		for(var l in pref_d[i]){
+			pd[i][l] = 1;
+		}
+		
+		for(var l in tab_z[i]){
+			z[i][l] = 1;
+		}
+		
+		for(var l in tab_d[i]){
+			d[i][l] = 1;
+		}
+	}
+}
+
+
+dvar int x[i in team][1..T][1..m] in (0..1); //le chauffeur i travail le matin de la période j pour le bus k
+dvar int y[i in team][1..T][1..m] in (0..1);// le chauffeur i travail l'aprem de la periode j pour le bus k
+
+ 
+maximize 3*sum(i in team, j in 1..T, k in 1..m)(pm[i][j]*x[i][j][k] + pa[i][j]*y[i][j][k])
+	   + 4*sum(i in team, j in 1..T, k in 1..m)(pd[i][j]*(1-(x[i][j][k] + y[i][j][k])))
+	   - 8*sum(i in team)(4-sum(j in 1..T, k in 1..m)(y[i][j][k]))
+	   -10*sum(i in team, j in 1..T-2, k in 1..m)(sum(a in 0..2)(y[i][j+a][k] - 3))
+	   + 5*sum(i in team, j in 1..T-2, k in 1..m)(3-sum(a in 0..2)(x[i][j+a][k] + y[i][j+a][k]));
+	   
+
+subject to{
+	forall(j in 1..T, k in 1..m){
+		ct1: sum(i in team)x[i][j][k] == 1; //un chauffeur par jour et par ligne
+		ct2: sum(i in team)y[i][j][k] == 1;	//un chauffeur par nuit et par ligne
+	}
+
+	forall(i in team){
+		ct3: sum(k in 1..m, j in 1..T)(y[i][j][k]) <= 4; //pas plus de 4 nuit par roulement	(optionnel)
+	}
+
+	forall(i in team, j in 1..T){
+		ct4: sum(k in 1..m)(x[i][j][k] + y[i][j][k]) + d[i][j] <= 1; //jour, nuit ou congés
+		forall(k in 1..m){
+			ct7: x[i][j][k] <= z[i][k];
+			ct8: y[i][j][k] <= z[i][k];		
+		}
+	}
+
+	forall(i in team, j in 1..T-1){
+		ct6: sum(k in 1..m)(y[i][j][k] + x[i][j+1][k]) <= 1;
+	}		
+}
+	   
+	   
+ execute pstpro{
+ for(var j=1; j<=T; j++){
+ 	for(var k=1; k<=m; k++){
+ 		for(var i in team){
+ 			if(x[i][j][k] == 1){
+ 				//writeln("Le chauffeur: "+i+", Pour le bus: "+k+", Le jour: "+j); 	
+ 				writeln("Le jour "+j+" Bus "+k+" chauffeur "+i);		
+ 			} 		
+ 		} 	
+ 	}
+ }
+ 
+ writeln("  ");
+ 
+  for(var j=1; j<=T; j++){
+ 	for(var k=1; k<=m; k++){
+ 		for(var i in team){
+ 			if(y[i][j][k] == 1){
+ 				//writeln("Le chauffeur: "+i+", Pour le bus: "+k+", La nuit: "+j); 			
+ 				writeln("Le jour "+j+" Bus "+k+" chauffeur "+i);		
+ 			} 		
+ 		} 	
+ 	}
+ }
+ 
+ 
+ writeln("\nScore Nuit");
+ 
+ 
+ for(var i in team){
+ 	var c = 0; 	
+ 	for(var j=1; j<=T; j++){	
+ 		for(var k=1; k<=m; k++){
+ 			if(y[i][j][k] == 1){
+ 				c = c +1; 			
+ 			} 		
+ 		}
+ 	} 		
+ 	writeln("Le chaffeur "+i+" a "+c+" nuits");	 	
+ }
+ 
+ writeln("\nLes bus");
+ 
+ for(var k=1; k<=m; k++){
+ 	for(var j=1; j<=T; j++){
+ 		var c1 = 0;
+ 		var c2 = 0;
+ 		for(i in team){
+ 			if(x[i][j][k] == 1){
+ 				c1 = c1 + 1; 			
+ 			}
+ 			if(y[i][j][k] == 1){
+ 				c2 = c2 + 1; 			
+ 			} 		
+ 		}
+ 		writeln("la ligne "+k+" à la date "+j+" a "+c1+" le jour, "+c2+" la nuit");	
+ 	}
+ }
+ 
+
+
+writeln("\nCongés  ");
+for(var i in team){
+  for(var j=1; j<=T; j++){
+ 		var c = 0;
+ 		for(var k=1; k<=m; k++){
+ 			if(y[i][j][k] == 1 || x[i][j][k] == 1){
+ 				c = c + 1; 			
+ 			} 		
+ 		}
+ 		if(c == 0){
+ 			writeln("Le chauffeur "+i+" prend congés le "+j);
+   		} 		 	
+ 	}
+ }
+ 
+ 
+ writeln("ok");
+}  
+ 
+ 
